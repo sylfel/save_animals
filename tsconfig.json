@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "outDir": "dist", // where to put the compiled JS files
+        "target": "esnext",
+        "useDefineForClassFields": true,
+        "module": "esnext",
+        "lib": ["esnext", "dom"],
+        "moduleResolution": "nodenext",
+        "strict": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "noEmit": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "skipLibCheck": true
+    },
+    "include": ["src", "vite.config.js"],
+    "exclude": ["node_modules"] // which files to skip
+}
