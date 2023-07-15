@@ -19,7 +19,7 @@ const TILE_ROW = 20
 initPointer()
 
 const loadAssets = () =>
-    load('/assets/MasterSimple.png', '/assets/spritesheet.png')
+    load('assets/MasterSimple.png', 'assets/spritesheet.png')
 const prepareTileEngine = (img: HTMLImageElement, grid: Grid) => {
     const tileEngine = CustomTileEngine({
         // tile size
@@ -74,9 +74,9 @@ const FRAME_RATE = 10
 const initGame = async () => {
     await loadAssets()
     const _g = new Grid(TILE_COL, TILE_ROW)
-    const tileEngine = prepareTileEngine(imageAssets['/assets/MasterSimple'], _g)
+    const tileEngine = prepareTileEngine(imageAssets['assets/MasterSimple'], _g)
     const spriteSheet = prepareSpritesheet(
-        imageAssets['/assets/spritesheet.png']
+        imageAssets['assets/spritesheet.png']
     )
 
     spriteSheet.createAnimations({
