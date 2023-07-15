@@ -4,7 +4,7 @@ export default defineConfig({
     server: {
         port: 8000,
     },
-    base: '',
+    base: '/save_animals/',
     publicDir: 'public',
     build: {
         target: 'esnext',
