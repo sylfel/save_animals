@@ -13,16 +13,14 @@
             }
             canvas {
                 display: block;
-                margin: 10px auto;
-                transform: scale(3);
-                transform-origin: top;
                 image-rendering: crisp-edges;
             }
+            #a {position:fixed;width:99.5vmin;top:49.9%;left:49.9%;transform:translateX(-50%)translateY(-50%);background:#50514f}
         </style>
     </head>
 
     <body>
-        <canvas width="320" height="320"></canvas>
+        <canvas width="320" height="320" id="a"></canvas>
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>

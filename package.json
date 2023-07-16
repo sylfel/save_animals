@@ -6,7 +6,7 @@
         "dev": "vite",
         "build": "vite build",
         "prepare": "husky install",
-        "lint": "eslint --ext .js,.ts --cache .",
+        "lint": "eslint --ext .js,.ts --cache src",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
     },
     "author": "",

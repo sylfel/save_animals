@@ -43,19 +43,19 @@ export class Grid {
     end: Cell
 
     constructor(width: number, height: number) {
-        const ZONE_SIZE = 0 | ((width * height) / 150)
+        const ZONE_SIZE = 0 | ((width * height) / 100)
         this.width = width
         this.height = height
         this.cells = []
         this.init()
-        this.start = new Cell(randInt(1, ZONE_SIZE), randInt(1, ZONE_SIZE))
+        this.start = new Cell(randInt(2, ZONE_SIZE), randInt(2, ZONE_SIZE))
         this.end = new Cell(
-            randInt(this.height - ZONE_SIZE, this.height),
-            randInt(this.width - ZONE_SIZE, this.width)
+            randInt(this.height - ZONE_SIZE, this.height - 1),
+            randInt(this.width - ZONE_SIZE, this.width - 1)
         )
         this.generatePath(this.start, this.end)
-        this.randomize()
         this.fill()
+        this.randomize()
     }
 
     private init() {
@@ -87,7 +87,7 @@ export class Grid {
                 directions.push(Direction.UP)
             }
             // Choix d'une directions parmi les possibles
-            const direction = directions[randInt(0, directions.length)]
+            const direction = directions[randInt(0, directions.length - 1)]
             switch (direction) {
                 case Direction.DOWN:
                     next.row = next.row + 1
