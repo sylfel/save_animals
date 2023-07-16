@@ -13,8 +13,8 @@ import { Controller } from './controller'
 
 const { context } = init()
 context.imageSmoothingEnabled = false
-const TILE_COL = 20
-const TILE_ROW = 20
+const TILE_COL = 16
+const TILE_ROW = 16
 
 initPointer()
 
