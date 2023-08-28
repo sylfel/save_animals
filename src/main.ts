@@ -13,8 +13,8 @@ import { Controller } from './controller'
 
 const { context } = init()
 context.imageSmoothingEnabled = false
-const TILE_COL = 16
-const TILE_ROW = 16
+const TILE_COL = 12
+const TILE_ROW = 12
 
 initPointer()
 
@@ -124,14 +124,14 @@ const initGame = async () => {
 
     tileEngine.onDown(({ row, col, data }) => {
         const road = getRoadFromSprite(data['road'])
-        if (road != UNKNOWN && road.canRotate()) {
+        if (_g.isStart(col, row)) {
+            controller.addSprite(row, col)
+        } else if (road != UNKNOWN && road.canRotate()) {
             tileEngine.setTileAtLayer(
                 'road',
                 { row, col },
                 road.rotateRight().sprite
             )
-        } else {
-            controller.addSprite(row, col)
         }
     })
 

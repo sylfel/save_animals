@@ -144,4 +144,9 @@ export class Grid {
             }
         })
     }
+
+    public isStart(col: number, row: number) {
+        const {row: startRow, col: startCol} =  this.start.position()
+        return startCol === col && startRow === row
+    }
 }
