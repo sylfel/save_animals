@@ -120,18 +120,16 @@ const initGame = async () => {
         },
     })
 
-    const controller = new Controller(tileEngine, spriteSheet)
+    const controller = new Controller(_g, tileEngine, spriteSheet)
 
     tileEngine.onDown(({ row, col, data }) => {
         const road = getRoadFromSprite(data['road'])
         if (_g.isStart(col, row)) {
             controller.addSprite(row, col)
         } else if (road != UNKNOWN && road.canRotate()) {
-            tileEngine.setTileAtLayer(
-                'road',
-                { row, col },
-                road.rotateRight().sprite
-            )
+            const newRoad = road.rotateRight()
+            tileEngine.setTileAtLayer('road', { row, col }, newRoad.sprite)
+            _g.setRoad(col, row, newRoad)
         }
     })
 

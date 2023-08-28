@@ -6,7 +6,7 @@ class Cell {
     row: number
     col: number
     directions: Direction[]
-    road: Road
+    private road: Road
     canRotate: boolean
 
     constructor(row: number, col: number) {
@@ -23,6 +23,7 @@ class Cell {
 
     setRoad(road: Road, canRotate: boolean) {
         this.road = road
+        this.directions = road.directions
         this.canRotate = canRotate
     }
 
@@ -33,9 +34,38 @@ class Cell {
     position() {
         return { row: this.row, col: this.col }
     }
+
+    rotateLeft() {
+        if (!this.canRotate) {
+            return
+        }
+        this.road.rotateLeft()
+        this.directions = this.road.directions
+    }
+
+    rotateRight() {
+        if (!this.canRotate) {
+            return
+        }
+        this.road.rotateRight()
+        this.directions = this.road.directions
+    }
+
+    isUnknown() {
+        return this.road === UNKNOWN
+    }
+    getSprite(): number {
+        return this.road.sprite
+    }
+    randomizeRoad() {
+        this.road = getRandomRoad()
+    }
 }
 
 export class Grid {
+    setRoad(col: number, row: number, newRoad: Road) {
+        this.getCell({ col, row }).setRoad(newRoad, true)
+    }
     width: number
     height: number
     cells: Cell[]
@@ -124,29 +154,47 @@ export class Grid {
         this.cells.map((c) => {
             if (c.canRotate) {
                 if (Math.random() > 0.6) {
-                    c.road = c.road.rotateLeft()
+                    c.rotateLeft()
                 } else if (Math.random() < 0.4) {
-                    c.road = c.road.rotateRight()
+                    c.rotateRight()
                 }
             }
         })
     }
 
     public getRoadData() {
-        const roadData = this.cells.map((c) => c.road.sprite)
+        const roadData = this.cells.map((c) => c.getSprite())
         return roadData
     }
 
     private fill() {
         this.cells.map((c) => {
-            if (c.road == UNKNOWN) {
-                c.road = getRandomRoad()
+            if (c.isUnknown()) {
+                c.randomizeRoad()
             }
         })
     }
 
     public isStart(col: number, row: number) {
-        const {row: startRow, col: startCol} =  this.start.position()
+        const { row: startRow, col: startCol } = this.start.position()
         return startCol === col && startRow === row
+    }
+
+    public getCell({ col, row }: { col: number; row: number }) {
+        const cell = this.cells[row * this.width + col]
+        return cell
+    }
+
+    public getCellRelative(cell: Cell, direction: Direction) {
+        switch (direction) {
+            case Direction.RIGHT:
+                return this.getCell({ col: cell.col + 1, row: cell.row })
+            case Direction.UP:
+                return this.getCell({ col: cell.col, row: cell.row - 1 })
+            case Direction.DOWN:
+                return this.getCell({ col: cell.col, row: cell.row + 1 })
+            case Direction.LEFT:
+                return this.getCell({ col: cell.col - 1, row: cell.row })
+        }
     }
 }

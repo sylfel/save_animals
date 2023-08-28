@@ -1,6 +1,7 @@
 import { Animation, Sprite, SpriteSheet, TileEngine } from 'kontra'
-import { Direction, allDirection } from './direction'
+import { Direction, oppositeDirection } from './direction'
 import { getCol, getRow } from './customTileEngine'
+import { Grid } from './grid'
 
 const TILE_SIZE = 16
 
@@ -51,6 +52,10 @@ class SnappedSprite {
             this.sprite.playAnimation('walk_' + direction)
         }
     }
+
+    position() {
+        return { row: this.row, col: this.col }
+    }
 }
 
 const prepareSprite = (animations: { [name: string]: Animation }) => {
@@ -66,6 +71,7 @@ export class Controller {
     tw: number
 
     constructor(
+        private grid: Grid,
         private tileEngine: TileEngine,
         private spritesheet: SpriteSheet
     ) {
@@ -84,9 +90,25 @@ export class Controller {
         this.sprites.map((s) => {
             // S'il est pas en train de bouger, on lui donne un mouvement aléatoire
             if (!s.moveToNextTile) {
-                s.moveTo(
-                    allDirection[0 | (Math.random() * allDirection.length)]
-                )
+                const cell = this.grid.getCell(s.position())
+                let nextDirections = cell.directions.filter((d) => {
+                    const nextCell = this.grid.getCellRelative(cell, d)
+                    const include = nextCell.directions.includes(
+                        oppositeDirection(d)
+                    )
+                    return include
+                })
+                if (nextDirections.length > 1) {
+                    const oD = oppositeDirection(s.moveDirection)
+                    nextDirections = nextDirections.filter((d) => d != oD)
+                }
+                if (nextDirections.length > 0) {
+                    s.moveTo(
+                        nextDirections[
+                            0 | (Math.random() * nextDirections.length)
+                        ]
+                    )
+                }
             }
             s.update()
         })
