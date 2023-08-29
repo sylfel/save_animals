@@ -39,7 +39,7 @@ class Cell {
         if (!this.canRotate) {
             return
         }
-        this.road.rotateLeft()
+        this.road = this.road.rotateLeft()
         this.directions = this.road.directions
     }
 
@@ -47,7 +47,7 @@ class Cell {
         if (!this.canRotate) {
             return
         }
-        this.road.rotateRight()
+        this.road = this.road.rotateRight()
         this.directions = this.road.directions
     }
 
@@ -59,6 +59,7 @@ class Cell {
     }
     randomizeRoad() {
         this.road = getRandomRoad()
+        this.directions = this.road.directions
     }
 }
 
@@ -180,6 +181,11 @@ export class Grid {
         return startCol === col && startRow === row
     }
 
+    public isEnd(col: number, row: number) {
+        const { row: startRow, col: startCol } = this.end.position()
+        return startCol === col && startRow === row
+    }
+
     public getCell({ col, row }: { col: number; row: number }) {
         const cell = this.cells[row * this.width + col]
         return cell
@@ -188,13 +194,21 @@ export class Grid {
     public getCellRelative(cell: Cell, direction: Direction) {
         switch (direction) {
             case Direction.RIGHT:
-                return this.getCell({ col: cell.col + 1, row: cell.row })
+                if (cell.col < this.width - 1)
+                    return this.getCell({ col: cell.col + 1, row: cell.row })
+                else return false
             case Direction.UP:
-                return this.getCell({ col: cell.col, row: cell.row - 1 })
+                if (cell.row > 1)
+                    return this.getCell({ col: cell.col, row: cell.row - 1 })
+                else return false
             case Direction.DOWN:
-                return this.getCell({ col: cell.col, row: cell.row + 1 })
+                if (cell.row < this.height - 1)
+                    return this.getCell({ col: cell.col, row: cell.row + 1 })
+                else return false
             case Direction.LEFT:
-                return this.getCell({ col: cell.col - 1, row: cell.row })
+                if (cell.col > 0)
+                    return this.getCell({ col: cell.col - 1, row: cell.row })
+                else return false
         }
     }
 }

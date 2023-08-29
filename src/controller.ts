@@ -91,23 +91,25 @@ export class Controller {
             // S'il est pas en train de bouger, on lui donne un mouvement aléatoire
             if (!s.moveToNextTile) {
                 const cell = this.grid.getCell(s.position())
-                let nextDirections = cell.directions.filter((d) => {
-                    const nextCell = this.grid.getCellRelative(cell, d)
-                    const include = nextCell.directions.includes(
-                        oppositeDirection(d)
-                    )
-                    return include
-                })
-                if (nextDirections.length > 1) {
-                    const oD = oppositeDirection(s.moveDirection)
-                    nextDirections = nextDirections.filter((d) => d != oD)
-                }
-                if (nextDirections.length > 0) {
-                    s.moveTo(
-                        nextDirections[
-                            0 | (Math.random() * nextDirections.length)
-                        ]
-                    )
+                if (!this.grid.isEnd(cell.col, cell.row)) {
+                    let nextDirections = cell.directions.filter((d) => {
+                        const nextCell = this.grid.getCellRelative(cell, d)
+                        const include =
+                            nextCell &&
+                            nextCell.directions.includes(oppositeDirection(d))
+                        return include
+                    })
+                    if (nextDirections.length > 1) {
+                        const oD = oppositeDirection(s.moveDirection)
+                        nextDirections = nextDirections.filter((d) => d != oD)
+                    }
+                    if (nextDirections.length > 0) {
+                        s.moveTo(
+                            nextDirections[
+                                0 | (Math.random() * nextDirections.length)
+                            ]
+                        )
+                    }
                 }
             }
             s.update()
