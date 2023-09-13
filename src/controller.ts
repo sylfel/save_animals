@@ -37,6 +37,7 @@ class SnappedSprite {
             }
         }
         // Check if the player has now reached the next block
+        // TODO : do a better check
         if (this.sprite.x % TILE_SIZE == 0 && this.sprite.y % TILE_SIZE == 0) {
             this.row = getRow(this.sprite.y, TILE_SIZE)
             this.col = getCol(this.sprite.x, TILE_SIZE)
@@ -49,6 +50,15 @@ class SnappedSprite {
         if (!this.moveToNextTile) {
             this.moveToNextTile = true
             this.moveDirection = direction
+            if (direction === Direction.LEFT) {
+                // left movement is "mirror of right movement"
+                // so, scale to inverse, and width to translate
+                this.sprite.scaleX = -1
+                this.sprite.width = -TILE_SIZE
+            } else {
+                this.sprite.scaleX = 1
+                this.sprite.width = TILE_SIZE
+            }
             this.sprite.playAnimation('walk_' + direction)
         }
     }

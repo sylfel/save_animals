@@ -69,7 +69,7 @@ const prepareSpritesheet = (img: HTMLImageElement): SpriteSheet => {
     })
 }
 
-const FRAME_RATE = 10
+const FRAME_RATE = 12
 
 const initGame = async () => {
     await loadAssets()
