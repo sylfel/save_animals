@@ -11,7 +11,7 @@ class SnappedSprite {
     MOVEMENT_SPEED: number
 
     constructor(
-        private sprite: Sprite,
+        public sprite: Sprite,
         private row: number,
         private col: number
     ) {
@@ -101,6 +101,10 @@ export class Controller {
             // S'il est pas en train de bouger, on lui donne un mouvement aléatoire
             if (!s.moveToNextTile) {
                 const cell = this.grid.getCell(s.position())
+                if (this.grid.isEnd(cell.col, cell.row)) {
+                    this.removeSprite(s)
+                }
+
                 if (!this.grid.isEnd(cell.col, cell.row)) {
                     let nextDirections = cell.directions.filter((d) => {
                         const nextCell = this.grid.getCellRelative(cell, d)
@@ -132,5 +136,13 @@ export class Controller {
         sprite.y = row * this.th
         this.tileEngine.add(sprite)
         this.sprites.push(new SnappedSprite(sprite, row, col))
+    }
+
+    public removeSprite(snappedSprite: SnappedSprite) {
+        this.tileEngine.remove(snappedSprite.sprite)
+        this.sprites.splice(
+            this.sprites.findIndex((s) => s === snappedSprite),
+            1
+        )
     }
 }
