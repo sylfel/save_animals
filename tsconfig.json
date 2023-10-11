@@ -3,7 +3,7 @@
         "outDir": "dist", // where to put the compiled JS files
         "target": "esnext",
         "useDefineForClassFields": true,
-        "module": "esnext",
+        "module": "nodenext",
         "lib": ["esnext", "dom"],
         "moduleResolution": "nodenext",
         "strict": true,
