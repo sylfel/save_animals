@@ -5,11 +5,15 @@ import {
     imageAssets,
     initPointer,
     SpriteSheet,
+    on,
+    GameObject,
+    Scene,
 } from 'kontra'
 import CustomTileEngine from './customTileEngine'
 import { HOUSE_1, HOUSE_2, UNKNOWN, getRoadFromSprite } from './road'
-import { Grid } from './grid'
 import { Controller } from './controller'
+import { sceneIntro } from './scene/intro'
+import { Grid } from './grid'
 
 const { context } = init()
 context.imageSmoothingEnabled = false
@@ -18,8 +22,9 @@ const TILE_ROW = 12
 
 initPointer()
 
-const loadAssets = () =>
-    load('assets/MasterSimple.png', 'assets/spritesheet.png')
+const loadAssets = () => {
+    return load('assets/MasterSimple.png', 'assets/spritesheet.png')
+}
 const prepareTileEngine = (img: HTMLImageElement, grid: Grid) => {
     const tileEngine = CustomTileEngine({
         // tile size
@@ -51,7 +56,7 @@ const prepareTileEngine = (img: HTMLImageElement, grid: Grid) => {
             {
                 name: 'object',
                 data: [],
-                visible: false,
+                visible: true,
             },
         ],
     })
@@ -68,6 +73,8 @@ const prepareSpritesheet = (img: HTMLImageElement): SpriteSheet => {
         frameHeight: 16,
     })
 }
+
+type SimpleGameObject = Pick<GameObject, 'render' | 'update'>
 
 const FRAME_RATE = 12
 
@@ -122,6 +129,11 @@ const initGame = async () => {
 
     const controller = new Controller(_g, tileEngine, spriteSheet)
 
+    const sceneEngine = Scene({
+        id: 'game',
+        objects: [tileEngine],
+    })
+
     tileEngine.onDown(({ row, col, data }) => {
         const road = getRoadFromSprite(data['road'])
         if (_g.isStart(col, row)) {
@@ -133,28 +145,23 @@ const initGame = async () => {
         }
     })
 
-    let t = 0
+    let currentScene: SimpleGameObject = sceneIntro('Save', 'The', 'Animals')
+    const sceneCallback = (emmiter: string) => {
+        if (emmiter === 'intro') {
+            currentScene = sceneEngine
+        }
+    }
+    on('scene.finish', sceneCallback)
+
     const loop = GameLoop({
         update: function (dt) {
-            t += dt
-            if (t > 0.2) {
-                for (let row = 0; row < TILE_ROW; row++) {
-                    for (let col = 0; col < TILE_COL; col++) {
-                        /*tileEngine.setTileAtLayer(
-                            'ground',
-                            { row, col },
-                            Math.floor(Math.random() * 3) + 98
-                            
-                        )*/
-                    }
-                }
-                t = 0
-            }
+            currentScene.update && currentScene.update(dt)
             controller.update()
         },
         render: function () {
-            tileEngine.render()
-            tileEngine.renderLayer('object')
+            // tileEngine.render()
+            // tileEngine.renderLayer('object')
+            currentScene.render()
         },
     })
 
