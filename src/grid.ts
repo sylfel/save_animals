@@ -74,15 +74,15 @@ export class Grid {
     end: Cell
 
     constructor(width: number, height: number) {
-        const ZONE_SIZE = 0 | ((width * height) / 100)
+        const ZONE_SIZE = 0 | ((width * height) / 60)
         this.width = width
         this.height = height
         this.cells = []
         this.init()
-        this.start = new Cell(randInt(2, ZONE_SIZE), randInt(2, ZONE_SIZE))
+        this.start = new Cell(randInt(1, ZONE_SIZE), randInt(1, this.width - 1))
         this.end = new Cell(
             randInt(this.height - ZONE_SIZE, this.height - 1),
-            randInt(this.width - ZONE_SIZE, this.width - 1)
+            randInt(1, this.width - 1)
         )
         this.generatePath(this.start, this.end)
         this.fill()
@@ -143,10 +143,7 @@ export class Grid {
 
         path.map((c, i, all) => {
             const isStartorEnd = i == 0 || i == all.length - 1
-            c.setRoad(
-                getRoadFromDirection(c.directions, isStartorEnd),
-                !isStartorEnd
-            )
+            c.setRoad(getRoadFromDirection(c.directions, true), !isStartorEnd)
             this.cells[c.row * this.width + c.col] = c
         })
     }
