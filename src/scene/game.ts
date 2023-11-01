@@ -1,4 +1,4 @@
-import { imageAssets, SpriteSheet, Scene, SpriteClass, track } from 'kontra'
+import { imageAssets, SpriteSheet, Scene, track } from 'kontra'
 import CustomTileEngine from '../customTileEngine'
 import { UNKNOWN, getRoadFromSprite } from '../road'
 import { Controller } from '../controller'
@@ -10,6 +10,7 @@ import {
     TILE_ROW,
     TILE_WIDTH,
 } from '../constant'
+import { CustomSprite } from './CustomSprite'
 
 const prepareTileEngine = (
     img: HTMLImageElement | HTMLCanvasElement,
@@ -49,10 +50,6 @@ const prepareTileEngine = (
             },
         ],
     })
-
-    // tileEngine.setTileAtLayer('object', grid.start.position(), HOUSE_1.sprite)
-    // tileEngine.setTileAtLayer('object', grid.end.position(), HOUSE_2.sprite)
-
     return tileEngine
 }
 const prepareSpritesheet = (img: HTMLImageElement): SpriteSheet => {
@@ -61,38 +58,6 @@ const prepareSpritesheet = (img: HTMLImageElement): SpriteSheet => {
         frameWidth: 16,
         frameHeight: 16,
     })
-}
-
-class CustomSprite extends SpriteClass {
-    init({ ...props }): void {
-        const frame = props.spritesheet.frame
-        const width = frame.width | 0
-        const height = frame.height | 0
-        super.init({ width, height, ...props })
-        this.setFrame(props.frame)
-    }
-
-    setFrame(frame: number) {
-        const row = (frame / this.spritesheet._f) | 0
-        const col = frame % this.spritesheet._f | 0
-        this.ssx = col * this.width
-        this.ssy = row * this.height
-    }
-
-    draw() {
-        const { spritesheet, context, ssx, ssy, width, height } = this
-        context.drawImage(
-            spritesheet.image,
-            ssx,
-            ssy,
-            width,
-            height,
-            0,
-            0,
-            width,
-            height
-        )
-    }
 }
 
 const initGame = () => {
@@ -175,9 +140,7 @@ const initGame = () => {
 
     tileEngine.onDown(({ row, col, data }) => {
         const road = getRoadFromSprite(data['road'])
-        if (_g.isStart(col, row)) {
-            // controller.addSprite(row, col)
-        } else if (road != UNKNOWN && road.canRotate()) {
+        if (road != UNKNOWN && road.canRotate()) {
             const newRoad = road.rotateRight()
             tileEngine.setTileAtLayer('road', { row, col }, newRoad.sprite)
             _g.setRoad(col, row, newRoad)
@@ -189,7 +152,6 @@ const initGame = () => {
         objects: [tileEngine],
         update: () => {
             controller.update()
-            // s.update()
         },
         render: function () {
             tileEngine.render()
