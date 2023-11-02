@@ -19,16 +19,16 @@ export class CustomSprite extends SpriteClass {
         this.frame = frame
         const row = (frame / this.spritesheet._f) | 0
         const col = frame % this.spritesheet._f | 0
-        this.ssx = col * this.width
-        this.ssy = row * this.height
+        this.srcX = col * this.width
+        this.srcY = row * this.height
     }
 
     draw() {
-        const { spritesheet, context, ssx, ssy, width, height } = this
+        const { spritesheet, context, srcX, srcY, width, height } = this
         context.drawImage(
             spritesheet.image,
-            ssx,
-            ssy,
+            srcX,
+            srcY,
             width,
             height,
             0,
