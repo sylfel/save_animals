@@ -1,165 +1,173 @@
-import { imageAssets, SpriteSheet, Scene, track } from 'kontra'
-import CustomTileEngine from '../customTileEngine'
-import { UNKNOWN, getRoadFromSprite } from '../road'
-import { Controller } from '../controller'
-import { Grid } from '../grid'
 import {
-    FRAME_RATE,
-    TILE_COL,
-    TILE_HEIGHT,
-    TILE_ROW,
-    TILE_WIDTH,
-} from '../constant'
-import { CustomSprite } from './CustomSprite'
+    Scene,
+    SpriteSheet,
+    imageAssets,
+    on,
+    onKey,
+    randInt,
+    track,
+    untrack,
+} from 'kontra'
+import { GridView } from '../component/gridview.js'
+import { generateGrid } from '../utils/generator.js'
+import { CellType, TILE_COL, TILE_ROW } from '../constant.js'
+import { Cell } from '../component/cell.js'
+import { Grid } from '../component/grid.js'
+import { randArray } from '../utils/utils.js'
+import { AnimalSprite } from './animalSprite.js'
+import { CustomSprite } from './CustomSprite.js'
 
-const prepareTileEngine = (
-    img: HTMLImageElement | HTMLCanvasElement,
-    grid: Grid
+// TODO : configurer tous les animaux
+const animalConfig = {
+    // s1: 0,
+    // s2: 4,
+    // s3: 8,
+    // s4: 12,
+    // //
+    // s5: 48,
+    // s6: 52,
+    // s7: 56,
+    // s8: 60,
+    // //
+    // s9: 96,
+    // s10: 100,
+    // s11: 104,
+    // s12: 108,
+    // //
+    // m1: 148,
+    // m2: 156,
+    // //
+    // m3: 196,
+    // m4: 204,
+    // //
+    // o1: 288,
+    // o2: 292,
+    // o3: 296,
+    // //
+    // mouton1:336,
+    // mouton2:340,
+    //
+    w1: 384,
+    w2: 388,
+    w3: 392,
+    w4: 396,
+    //
+    w5: 432,
+    w6: 436,
+}
+
+const createGridView = (spriteSheet: SpriteSheet) => {
+    const grid = new Grid(TILE_COL, TILE_ROW, spriteSheet)
+    const gridView = new GridView({ grid })
+    return gridView
+}
+
+const fillGrid = (gridView: GridView) => {
+    const seed = randInt(0, 100)
+    generateGrid(seed, gridView.getGrid())
+    let sprites = gridView.getGrid().generateSprite()
+    gridView.getGrid().randomRotate()
+    track(sprites)
+    gridView.addSprite(...sprites)
+}
+
+const addAnimal = (
+    gridView: GridView,
+    cell: Cell,
+    spriteAnimals: SpriteSheet
 ) => {
-    const tileEngine = CustomTileEngine({
-        // tile size
-        tilewidth: TILE_WIDTH,
-        tileheight: TILE_HEIGHT,
-
-        // map size in tiles
-        width: TILE_COL,
-        height: TILE_ROW,
-
-        // tileset object
-        tilesets: [
-            {
-                firstgid: 1,
-                image: img,
-            },
-        ],
-
-        // layer object
-        layers: [
-            {
-                name: 'ground',
-                data: Array(TILE_COL * TILE_ROW).fill(18), // vert : 18 , bleu : 82
-            },
-            {
-                name: 'road',
-                data: grid.getRoadData(),
-            },
-            {
-                name: 'object',
-                data: [],
-                visible: true,
-            },
-        ],
+    const animal = new AnimalSprite({
+        animal: randArray(Object.keys(animalConfig)),
+        cell,
+        animations: spriteAnimals.animations,
+        gridView,
     })
-    return tileEngine
-}
-const prepareSpritesheet = (img: HTMLImageElement): SpriteSheet => {
-    return SpriteSheet({
-        image: img,
-        frameWidth: 16,
-        frameHeight: 16,
-    })
+    gridView.addSprite(animal)
 }
 
-const initGame = () => {
-    const _g = new Grid(TILE_COL, TILE_ROW)
-    const spriteSheetDecor = prepareSpritesheet(
-        imageAssets['assets/MasterSimple']
-    )
-    const spriteSheet = prepareSpritesheet(
-        imageAssets['assets/spritesheet.png']
-    )
+const removeAnimal = (
+    gridView: GridView,
+    _cell: Cell,
+    animal: CustomSprite
+) => {
+    gridView.removeSprite(animal)
+}
 
-    const tileEngine = prepareTileEngine(spriteSheetDecor.image, _g)
-
-    const s = new CustomSprite({
-        spritesheet: spriteSheetDecor,
-        x: _g.start.position().col * TILE_WIDTH,
-        y: _g.start.position().row * TILE_HEIGHT,
-        frame: 43,
-        onDown: function () {
-            controller.addSprite(
-                _g.start.position().row,
-                _g.start.position().col
-            )
-        },
-    })
-    track(s)
-    tileEngine.add(s)
-
-    const s2 = new CustomSprite({
-        spritesheet: spriteSheetDecor,
-        gridPos: _g.end.position(),
-        frame: 27,
-        x: _g.end.position().col * TILE_WIDTH,
-        y: _g.end.position().row * TILE_HEIGHT,
-    })
-    tileEngine.add(s2)
-
-    spriteSheet.createAnimations({
-        /*m_idle: {
-            frames: '340',
-        },
-        m_walk_right: {
-            frames: '340..343',
-            frameRate: 60,
-        },
-        m_walk_down: {
-            frames: '356..359',
-            frameRate: 60,
-        },
-        m_walk_up: {
-            frames: '372..375',
-            frameRate: 60,
-        },
-        m_walk_left: {
-            frames: '340..343',
-            frameRate: 60,
-        },*/
-        idle: {
-            frames: '0',
-        },
-        walk_right: {
-            frames: '0..3',
-            frameRate: FRAME_RATE,
-        },
-        walk_down: {
-            frames: '16..19',
-            frameRate: FRAME_RATE,
-        },
-        walk_up: {
-            frames: '32..35',
-            frameRate: FRAME_RATE,
-        },
-        walk_left: {
-            frames: '0..3',
-            frameRate: FRAME_RATE,
-        },
-    })
-
-    const controller = new Controller(_g, tileEngine, spriteSheet)
-
-    tileEngine.onDown(({ row, col, data }) => {
-        const road = getRoadFromSprite(data['road'])
-        if (road != UNKNOWN && road.canRotate()) {
-            const newRoad = road.rotateRight()
-            tileEngine.setTileAtLayer('road', { row, col }, newRoad.sprite)
-            _g.setRoad(col, row, newRoad)
-        }
-    })
-
+const createScene = (gridView: GridView, spriteAnimals: SpriteSheet) => {
     const sceneEngine = Scene({
         id: 'game',
-        objects: [tileEngine],
+        objects: [gridView],
+        onShow: () => {
+            onKey('g', () => {
+                untrack(gridView.getSprites())
+                fillGrid(gridView)
+            })
+
+            on('cell.ondown', (cell: Cell) => {
+                if (cell.type === CellType.START) {
+                    addAnimal(gridView, cell, spriteAnimals)
+                } else if (cell.canRotate) {
+                    cell.rotate()
+                }
+            })
+
+            on('animal.onCell', (animal: CustomSprite, cell: Cell) => {
+                if (cell.type === CellType.END) {
+                    removeAnimal(gridView, cell, animal)
+                }
+            })
+        },
         update: () => {
-            controller.update()
+            gridView.update()
         },
         render: function () {
-            tileEngine.render()
-            tileEngine.renderLayer('object')
+            gridView.render()
         },
     })
 
     return sceneEngine
+}
+
+const createSripteSheetAnimals = () => {
+    //
+    const spriteAnimals = SpriteSheet({
+        image: imageAssets['assets/spritesheet'],
+        frameWidth: 16,
+        frameHeight: 16,
+    })
+    // create animations
+    const directions = ['right', 'down', 'up']
+    const animations = {} as { [key: string]: {} }
+    for (let [key, value] of Object.entries(animalConfig)) {
+        directions.forEach((dir, idx) => {
+            const animKey = key + '_walk_' + dir
+            animations[animKey] = {
+                frames:
+                    String(value + idx * 16) +
+                    '..' +
+                    String(value + idx * 16 + 3),
+                frameRate: 15,
+            }
+        })
+        animations[key + '_walk_left'] = animations[key + '_walk_right']
+    }
+    spriteAnimals.createAnimations(animations)
+    // return final
+    return spriteAnimals
+}
+
+const initGame = () => {
+    const spriteAnimals = createSripteSheetAnimals()
+
+    const spriteSheet = SpriteSheet({
+        image: imageAssets['assets/MasterSimple'],
+        frameWidth: 16,
+        frameHeight: 16,
+    })
+    const gridView = createGridView(spriteSheet)
+    fillGrid(gridView)
+
+    return createScene(gridView, spriteAnimals)
 }
 
 export { initGame }

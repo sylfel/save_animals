@@ -1,5 +1,7 @@
-import { Text, emit } from 'kontra'
-import { easeInOutSine } from '../utils'
+import { Scene, Text, emit } from 'kontra'
+import { easeInOutSine } from '../utils/utils.js'
+
+const TEXT_SPEED = 0.1
 
 const sceneIntro = (...allText: string[]) => {
     let phase = 0
@@ -34,7 +36,7 @@ const sceneIntro = (...allText: string[]) => {
         update(dt) {
             t += dt ?? 0
             if (phase != 2) {
-                let opa = easeInOutSine(t, 0, 1, 0.6)
+                let opa = easeInOutSine(t, 0, 1, TEXT_SPEED)
                 if (opa >= 0.95) {
                     phase = 1
                     opa = 1
@@ -49,7 +51,10 @@ const sceneIntro = (...allText: string[]) => {
         },
     })
 
-    return introText
+    return Scene({
+        id: 'intro',
+        objects: [introText],
+    })
 }
 
 export { sceneIntro }
